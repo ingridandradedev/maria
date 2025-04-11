@@ -1,0 +1,5 @@
+# Ignorar a pasta venv
+venv/
+
+# Ignorar a pasta .langgraph_api
+.langgraph_api/
