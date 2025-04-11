@@ -1,11 +1,6 @@
 from typing import Annotated, List, TypedDict
-from langchain_core.messages import BaseMessage
-from langgraph.graph.message import Message  # Ajuste o caminho conforme necessário
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from langgraph.graph.message import add_messages
-from langgraph.checkpoint.base import Message
-# OU
-from langchain_core.messages import BaseMessage
-
 
 class MeetingSummaryState(TypedDict):
     """

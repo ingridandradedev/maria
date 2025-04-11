@@ -1,4 +1,5 @@
-langchain
+langchain-core
 langgraph
+langchain-google-vertexai
 google-generativeai
 python-dotenv
