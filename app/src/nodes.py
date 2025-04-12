@@ -1,23 +1,70 @@
-#nodes.py
 import os
-import vertexai
+import logging
 from typing import Dict, Any
 from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from google.cloud import speech
 from dotenv import load_dotenv
 
 # Carrega variáveis de ambiente
 load_dotenv()
+logging.basicConfig(level=logging.DEBUG)
+
+def transcribe_audio(state: Dict[str, Any]):
+    """
+    Transcreve um arquivo de áudio usando Google Speech-to-Text v1 para áudios longos.
+    Suporta arquivos do Google Cloud Storage.
+    """
+    client = speech.SpeechClient()
+
+    config = speech.RecognitionConfig(
+        encoding=speech.RecognitionConfig.AudioEncoding.MP3,
+        sample_rate_hertz=44100,
+        language_code="pt-BR",
+        enable_automatic_punctuation=True
+    )
+
+    try:
+        logging.debug(f"Iniciando transcrição de áudio longo: {state['audio_file']}")
+
+        operation = client.long_running_recognize(
+            request={
+                "config": config,
+                "audio": speech.RecognitionAudio(uri=state["audio_file"])
+            }
+        )
+
+        logging.debug("Aguardando conclusão da transcrição...")
+        response = operation.result(timeout=300)
+
+        transcripts = [result.alternatives[0].transcript for result in response.results]
+        full_transcript = " ".join(transcripts)
+
+        logging.debug(f"Transcrição concluída. Tamanho: {len(full_transcript)} caracteres")
+
+        return {
+            "meeting_transcript": full_transcript,
+            "messages": [
+                {"role": "ai", "content": f"Transcrição concluída: {full_transcript[:100]}..."}
+            ]
+        }
+
+    except Exception as e:
+        logging.error(f"Erro detalhado na transcrição: {e}", exc_info=True)
+        return {
+            "meeting_transcript": "",
+            "messages": [
+                {"role": "ai", "content": f"Erro na transcrição: {str(e)}"}
+            ]
+        }
 
 def load_gemini_model():
-    """Carrega o modelo Gemini 1.5 Pro"""
-    # Inicializa o Vertex AI com o project ID
-    vertexai.init(
-        project=os.getenv('GOOGLE_CLOUD_PROJECT'), 
+    from vertexai import init
+    init(
+        project=os.getenv('GOOGLE_CLOUD_PROJECT'),
         location="us-central1"
     )
-    
     return ChatVertexAI(
         model_name="gemini-1.5-pro",
         project=os.getenv('GOOGLE_CLOUD_PROJECT'),
@@ -26,53 +73,26 @@ def load_gemini_model():
         max_tokens=2048
     )
 
-def prepare_summary_prompt() -> ChatPromptTemplate:
-    """Cria o prompt para resumo de reunião"""
-    return ChatPromptTemplate.from_messages([
-        ("system", """Você é um agente de inteligência artificial especializado em resumir reuniões corporativas. 
-        Sua função é transformar transcrições de reuniões em um resumo executivo claro, organizado e útil para consulta posterior.
-
-        Com base na transcrição recebida, gere um resumo estruturado da reunião contendo os seguintes tópicos:
-
-        1. Objetivo da Reunião
-        Descreva de forma objetiva o motivo principal da reunião.
-
-        2. Pauta (Assuntos abordados)
-        Liste os tópicos principais discutidos.
-
-        3. Resumo das Discussões
-        Para cada item da pauta, descreva os principais pontos debatidos.
-
-        4. Decisões Tomadas
-        Aponte acordos, definições e resoluções ocorridas durante a reunião.
-
-        5. Encaminhamentos
-        Liste ações definidas, quem será o responsável e prazos (se mencionados).
-
-        6. Próximos Passos (se houver)
-        Aponte o que deve ser feito a seguir ou o que será discutido na próxima reunião.
-        """),
-        ("human", "Transcrição da reunião:\n{meeting_transcript}")
-    ])
-
 def generate_meeting_summary(state: Dict[str, Any]):
     """
-    Gera o resumo da reunião usando o modelo Gemini
+    Gera o resumo da transcrição de reunião usando Gemini
     """
     model = load_gemini_model()
-    prompt = prepare_summary_prompt()
     
-    # Cria o chain de processamento
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", "Você é um assistente especializado em resumir transcrições de reuniões."),
+        ("human", "Resuma a seguinte transcrição de reunião:\n\n{transcript}")
+    ])
+    
     chain = prompt | model | StrOutputParser()
-    
-    # Gera o resumo
-    summary = chain.invoke({
-        "meeting_transcript": state['meeting_transcript']
-    })
-    
+
+    # ✅ Agora o transcript é passado como dicionário, como esperado
+    summary = chain.invoke({"transcript": state["meeting_transcript"]})
+
     return {
         "meeting_summary": summary,
         "messages": [
+            *state.get("messages", []),
             {"role": "ai", "content": summary}
         ]
     }

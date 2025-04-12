@@ -1,0 +1,35 @@
+TURN 1
+g
+
+generate_summary
+
+View LLM run
+Esta transcrição de uma reunião de feedback entre Bruna (líder) e Bárbara (colaboradora), com a presença de um professor e Ingrid (desenvolvedora, observando). O objetivo é treinar Bruna na aplicação de uma técnica de feedback de 7 passos, focando no desenvolvimento da autoconfiança de Bárbara.
+
+**Pontos Fortes de Bárbara:** Empatia, proatividade, disponibilidade para ajudar os colegas, especialmente em análises de documentos, e receptividade a novas demandas e responsabilidades.
+
+**Ponto Fraco de Bárbara:** Falta de autoconfiança, que a impede de reconhecer suas contribuições e assumir novas tarefas, como a designação de atividades para a equipe.  Ela demonstra insegurança e receio da reação dos colegas.
+
+**Feedback Aplicado:** Bruna inicia com elogios aos pontos fortes de Bárbara. Em seguida, aborda a questão da autoconfiança, exemplificando com situações reais.  Utiliza perguntas para estimular a reflexão de Bárbara sobre as causas e consequências de sua insegurança.
+
+**Plano de Ação:** Bárbara se compromete a mudar sua atitude na designação de tarefas, buscando mais assertividade e justificando suas solicitações com base nas demandas da gestão.  Bruna se compromete a apoiar Bárbara, sugerindo cursos do Soluço (plataforma interna), treinamentos externos com psicólogos e cursos de sistemas e Excel.  O plano inclui um prazo de 12 meses para avaliar o progresso.
+
+**Observações Adicionais para Ingrid:** O professor destaca a importância da descrição de cargos para maior clareza das responsabilidades. Sugere que Bruna trabalhe com Bárbara na descrição de seu cargo ou formalize suas responsabilidades perante a equipe, especialmente a coordenação de atividades.  Isso visa facilitar a atuação de Bárbara e o entendimento da equipe.  Também menciona a futura integração desse processo com uma matriz de desenvolvimento.
+
+Finalmente, há uma breve discussão técnica sobre a gravação da reunião e onde o arquivo será salvo.
+AI
+Transcrição concluída: É bom. Agora vou fazer o feedback da barba, ela faz parte da responsabilidade social do pcerj e eu v...
+AI
+Esta transcrição de uma reunião de feedback entre Bruna (líder) e Bárbara (colaboradora), com a presença de um professor e Ingrid (desenvolvedora, observando). O objetivo é treinar Bruna na aplicação de uma técnica de feedback de 7 passos, focando no desenvolvimento da autoconfiança de Bárbara.
+
+**Pontos Fortes de Bárbara:** Empatia, proatividade, disponibilidade para ajudar os colegas, especialmente em análises de documentos, e receptividade a novas demandas e responsabilidades.
+
+**Ponto Fraco de Bárbara:** Falta de autoconfiança, que a impede de reconhecer suas contribuições e assumir novas tarefas, como a designação de atividades para a equipe.  Ela demonstra insegurança e receio da reação dos colegas.
+
+**Feedback Aplicado:** Bruna inicia com elogios aos pontos fortes de Bárbara. Em seguida, aborda a questão da autoconfiança, exemplificando com situações reais.  Utiliza perguntas para estimular a reflexão de Bárbara sobre as causas e consequências de sua insegurança.
+
+**Plano de Ação:** Bárbara se compromete a mudar sua atitude na designação de tarefas, buscando mais assertividade e justificando suas solicitações com base nas demandas da gestão.  Bruna se compromete a apoiar Bárbara, sugerindo cursos do Soluço (plataforma interna), treinamentos externos com psicólogos e cursos de sistemas e Excel.  O plano inclui um prazo de 12 meses para avaliar o progresso.
+
+**Observações Adicionais para Ingrid:** O professor destaca a importância da descrição de cargos para maior clareza das responsabilidades. Sugere que Bruna trabalhe com Bárbara na descrição de seu cargo ou formalize suas responsabilidades perante a equipe, especialmente a coordenação de atividades.  Isso visa facilitar a atuação de Bárbara e o entendimento da equipe.  Também menciona a futura integração desse processo com uma matriz de desenvolvimento.
+
+Finalmente, há uma breve discussão técnica sobre a gravação da reunião e onde o arquivo será salvo.

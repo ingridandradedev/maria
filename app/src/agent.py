@@ -1,7 +1,7 @@
-#agent.py
+# agent.py
 from langgraph.graph import StateGraph, START, END
 from src.state import MeetingSummaryState
-from src.nodes import generate_meeting_summary
+from src.nodes import transcribe_audio, generate_meeting_summary
 
 def create_meeting_summary_graph():
     """
@@ -9,13 +9,13 @@ def create_meeting_summary_graph():
     """
     graph_builder = StateGraph(MeetingSummaryState)
 
-    # Adiciona o nó de geração de resumo
+    # Adiciona os nós
+    graph_builder.add_node("transcribe_audio", transcribe_audio)
     graph_builder.add_node("generate_summary", generate_meeting_summary)
 
-    # Define o ponto de entrada
-    graph_builder.add_edge(START, "generate_summary")
-
-    # Define o ponto de saída
+    # Define as arestas
+    graph_builder.add_edge(START, "transcribe_audio")
+    graph_builder.add_edge("transcribe_audio", "generate_summary")
     graph_builder.add_edge("generate_summary", END)
 
     # Compila o grafo
