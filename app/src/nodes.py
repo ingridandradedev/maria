@@ -1,13 +1,27 @@
+#nodes.py
 import os
+import vertexai
 from typing import Dict, Any
 from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from dotenv import load_dotenv
+
+# Carrega variáveis de ambiente
+load_dotenv()
 
 def load_gemini_model():
     """Carrega o modelo Gemini 1.5 Pro"""
+    # Inicializa o Vertex AI com o project ID
+    vertexai.init(
+        project=os.getenv('GOOGLE_CLOUD_PROJECT'), 
+        location="us-central1"
+    )
+    
     return ChatVertexAI(
-        model_name="gemini-1.5-pro-001",
+        model_name="gemini-1.5-pro",
+        project=os.getenv('GOOGLE_CLOUD_PROJECT'),
+        location="us-central1",
         temperature=0.3,
         max_tokens=2048
     )

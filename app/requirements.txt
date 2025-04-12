@@ -3,3 +3,5 @@ langgraph
 langchain-google-vertexai
 google-generativeai
 python-dotenv
+google-auth
+google-cloud-aiplatform
