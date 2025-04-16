@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/maria-456618-871b8f622168.json
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - LANGSMITH_TRACING=${LANGSMITH_TRACING}
+      - LANGSMITH_ENDPOINT=${LANGSMITH_ENDPOINT}
+      - LANGSMITH_API_KEY=${LANGSMITH_API_KEY}
+      - LANGSMITH_PROJECT=${LANGSMITH_PROJECT}
+      - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2}

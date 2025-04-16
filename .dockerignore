@@ -1,0 +1,9 @@
+# Ignorar arquivos e pastas desnecessários
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.env
+venv/
+.langgraph_api/
