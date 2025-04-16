@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+langchain-core
+langgraph
+langchain-google-vertexai
+google-generativeai
+python-dotenv
+google-auth
+google-cloud-aiplatform
+google-cloud-speech
+vertexai
+google-cloud-storage
+requests
+pdfkit
+jinja2
