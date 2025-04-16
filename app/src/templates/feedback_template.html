@@ -6,7 +6,8 @@
     <style>
         body { font-family: Arial, sans-serif; font-size: 14px; margin: 40px; }
         .header { text-align: center; margin-bottom: 30px; }
-        .header img { width: 550px; }
+        .header-title { font-size: 32px; font-weight: bold; color: #333; margin-bottom: 10px; }
+        .header-subtitle { font-size: 20px; font-weight: normal; color: #555; }
         .section { margin-bottom: 20px; }
         .label { font-weight: bold; color: #333; }
         .campo { border: 1px solid #ccc; padding: 10px; min-height: 80px; margin-top: 5px; }
@@ -17,7 +18,8 @@
 </head>
 <body>
     <div class="header">
-        <img src="logo.png" alt="Logo Super Supervisor">
+        <div class="header-title">Super Supervisor</div>
+        <div class="header-subtitle">Ficha de Feedback</div>
     </div>
     <div class="section">
         <p><span class="label">Feedback Estruturado: Data</span> {{ data }}</p>
