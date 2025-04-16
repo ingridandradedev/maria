@@ -13,6 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copia o restante do código da aplicação
 COPY . .  
 
+# Copia o arquivo de credenciais para o contêiner
+COPY maria-456618-871b8f622168.json /app/maria-456618-871b8f622168.json
+
 # Expõe a porta que o FastAPI usará
 EXPOSE 8000
 
