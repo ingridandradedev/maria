@@ -1,22 +1,24 @@
 # agent.py
 from langgraph.graph import StateGraph, START, END
 from src.state import MeetingSummaryState
-from src.nodes import transcribe_audio, generate_meeting_summary
+from src.nodes import transcribe_audio, generate_feedback, generate_pdf_and_upload
 
 def create_meeting_summary_graph():
     """
-    Cria o grafo de fluxo para resumo de reunião
+    Cria o grafo de fluxo para feedback estruturado
     """
     graph_builder = StateGraph(MeetingSummaryState)
 
     # Adiciona os nós
     graph_builder.add_node("transcribe_audio", transcribe_audio)
-    graph_builder.add_node("generate_summary", generate_meeting_summary)
+    graph_builder.add_node("generate_feedback", generate_feedback)
+    graph_builder.add_node("generate_pdf_and_upload", generate_pdf_and_upload)
 
     # Define as arestas
     graph_builder.add_edge(START, "transcribe_audio")
-    graph_builder.add_edge("transcribe_audio", "generate_summary")
-    graph_builder.add_edge("generate_summary", END)
+    graph_builder.add_edge("transcribe_audio", "generate_feedback")
+    graph_builder.add_edge("generate_feedback", "generate_pdf_and_upload")
+    graph_builder.add_edge("generate_pdf_and_upload", END)
 
     # Compila o grafo
     return graph_builder.compile()

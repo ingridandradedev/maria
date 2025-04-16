@@ -1,12 +1,27 @@
 import os
 import logging
-import requests  # Adicionado para baixar o arquivo
+import requests
+import json
 from typing import Dict, Any
+from datetime import datetime, timedelta
+
+# Bibliotecas para PDF
+import pdfkit
+import jinja2
+
+# Google Cloud
+from google.cloud import storage
+from google.oauth2 import service_account
 from langchain_google_vertexai import ChatVertexAI
+from google.cloud import speech_v1p1beta1 as speech
+
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from google.cloud import speech_v1p1beta1 as speech  # <- versão beta para diarization
 from dotenv import load_dotenv
+
+# Configurações do Google Cloud Storage
+BUCKET_NAME = "maria-1-0-pecege"
+CREDENTIALS_PATH = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 # Carrega variáveis de ambiente
 load_dotenv()
@@ -153,5 +168,114 @@ def generate_meeting_summary(state: Dict[str, Any]):
         "messages": [
             *state.get("messages", []),
             {"role": "ai", "content": summary}
+        ]
+    }
+
+def generate_feedback(state: Dict[str, Any]):
+    """
+    Gera o feedback estruturado usando Gemini
+    """
+    model = load_gemini_model()
+
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", """Aja como um(a) gestor(a) experiente responsável por conduzir uma conversa de feedback estruturado com um(a) colaborador(a). 
+        Com base nas informações da transcrição, preencha os campos da ficha de feedback de forma objetiva, respeitosa e construtiva."""),
+        ("human", """Transcrição da reunião:
+        {transcript}
+
+        Preencha os seguintes campos em formato JSON (NÃO IGNORE essa instrução: NÃO coloque ```json na sua resposta):
+        - data: Data atual
+        - nome_do_liderado: Nome do colaborador
+        - nome_do_lider: Nome do líder
+        - passo1: Reconhecimento e valorização do potencial
+        - passo2: Descrição do comportamento atual
+        - passo3: Cenário esperado após mudança
+        - passo4: Reflexão sobre causas
+        - passo5: Ações de mudança propostas pelo liderado
+        - passo6: Ações sugeridas pelo líder
+        - pontos_fortes: Lista de pontos fortes
+        - exemplo_pontos_fortes: Exemplos dos pontos fortes
+        - pontos_fracos: Lista de pontos fracos
+        - exemplo_pontos_fracos: Exemplos dos pontos fracos
+         
+         NÃO IGNORE essa instrução: NÃO coloque ```json na sua resposta
+        """)
+    ])
+
+    chain = prompt | model | StrOutputParser()
+
+    try:
+        feedback_json_str = chain.invoke({
+            "transcript": state["meeting_transcript"]
+        })
+        
+        # Tenta parsear o JSON
+        feedback_content = json.loads(feedback_json_str)
+        
+        return {
+            "feedback_content": feedback_content,
+            "messages": [
+                *state.get("messages", []),
+                {"role": "ai", "content": "Feedback gerado com sucesso"}
+            ]
+        }
+    except Exception as e:
+        logging.error(f"Erro ao gerar feedback: {e}")
+        return {
+            "feedback_content": {},
+            "messages": [
+                *state.get("messages", []),
+                {"role": "ai", "content": f"Erro ao gerar feedback: {str(e)}"}
+            ]
+        }
+
+def generate_pdf_and_upload(state: Dict[str, Any]):
+    """
+    Gera um PDF com o feedback estruturado e faz upload para o Google Cloud Storage
+    """
+    feedback = state["feedback_content"]
+    template_path = os.path.join(os.path.dirname(__file__), "templates", "feedback_template.html")
+
+    # Carrega o template HTML
+    with open(template_path, "r", encoding="utf-8") as file:
+        template_content = file.read()
+
+    # Renderiza o template com os dados do feedback
+    template = jinja2.Template(template_content)
+    rendered_html = template.render(feedback)
+
+    # Caminho absoluto do executável wkhtmltopdf
+    config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
+    options = {
+        "enable-local-file-access": ""  # Permite acesso a arquivos locais
+    }
+
+    # Gera o PDF
+    pdf_path = "feedback.pdf"
+    pdfkit.from_string(rendered_html, pdf_path, configuration=config, options=options)
+
+    # Faz upload para o Google Cloud Storage
+    credentials = service_account.Credentials.from_service_account_file(CREDENTIALS_PATH)
+    storage_client = storage.Client(credentials=credentials)
+    bucket = storage_client.bucket(BUCKET_NAME)
+    blob = bucket.blob(pdf_path)
+
+    blob.upload_from_filename(pdf_path)
+
+    # Gera uma URL assinada válida por 1 hora
+    url_assinada = blob.generate_signed_url(
+        version="v4",
+        expiration=timedelta(hours=1),
+        method="GET"
+    )
+
+    # Remove o arquivo local
+    os.remove(pdf_path)
+
+    return {
+        "pdf_url": url_assinada,
+        "messages": [
+            *state.get("messages", []),
+            {"role": "ai", "content": "PDF gerado e enviado com sucesso"}
         ]
     }
