@@ -5,16 +5,16 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copia os arquivos de dependências
-COPY requirements.txt .
+COPY requirements.txt . 
 
 # Instala as dependências
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia o restante do código da aplicação
-COPY . .
+COPY . .  
 
 # Expõe a porta que o FastAPI usará
 EXPOSE 8000
 
 # Comando para iniciar a aplicação
-CMD ["uvicorn", "app.src.api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8000"]

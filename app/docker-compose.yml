@@ -3,12 +3,12 @@ version: "3.9"
 services:
   app:
     build:
-      context: .
+      context: ./app  # Atualizado para apontar para a pasta app
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - .:/app
+      - ./app:/app  # Atualizado para refletir o novo caminho
     environment:
       - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
       - GOOGLE_APPLICATION_CREDENTIALS=/app/maria-456618-871b8f622168.json
