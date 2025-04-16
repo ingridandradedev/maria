@@ -8,3 +8,4 @@ google-cloud-aiplatform
 google-cloud-speech
 vertexai
 google-cloud-storage
+requests

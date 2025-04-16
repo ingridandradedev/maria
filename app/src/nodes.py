@@ -1,5 +1,6 @@
 import os
 import logging
+import requests  # Adicionado para baixar o arquivo
 from typing import Dict, Any
 from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -14,7 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
 def transcribe_audio(state: Dict[str, Any]):
     """
     Transcreve um arquivo de áudio usando Google Speech-to-Text v1 com diarization.
-    Suporta arquivos do Google Cloud Storage.
+    Suporta URLs assinadas ao baixar o arquivo localmente.
     """
     client = speech.SpeechClient()
 
@@ -31,12 +32,33 @@ def transcribe_audio(state: Dict[str, Any]):
     )
 
     try:
-        logging.debug(f"Iniciando transcrição de áudio com diarization: {state['audio_file']}")
+        audio_file_url = state["audio_file"]
+        logging.debug(f"Baixando arquivo de áudio da URL: {audio_file_url}")
 
+        # Baixa o arquivo de áudio localmente
+        local_audio_path = "temp_audio.mp3"
+        with requests.get(audio_file_url, stream=True) as response:
+            response.raise_for_status()
+            with open(local_audio_path, "wb") as audio_file:
+                for chunk in response.iter_content(chunk_size=8192):
+                    audio_file.write(chunk)
+
+        logging.debug(f"Arquivo de áudio baixado com sucesso: {local_audio_path}")
+
+        # Lê o conteúdo do arquivo de áudio
+        with open(local_audio_path, "rb") as audio_file:
+            audio_content = audio_file.read()
+
+        # Configura o áudio para o Google Speech-to-Text
+        audio = speech.RecognitionAudio(content=audio_content)
+
+        logging.debug("Iniciando transcrição de áudio com diarization...")
+
+        # Envia a solicitação para o Google Speech-to-Text
         operation = client.long_running_recognize(
             request={
                 "config": config,
-                "audio": speech.RecognitionAudio(uri=state["audio_file"])
+                "audio": audio
             }
         )
 
@@ -77,6 +99,9 @@ def transcribe_audio(state: Dict[str, Any]):
         full_transcript = "\n".join(full_transcript_with_speakers)
 
         logging.debug(f"Transcrição com diarization concluída. Tamanho: {len(full_transcript)} caracteres")
+
+        # Remove o arquivo local após a transcrição
+        os.remove(local_audio_path)
 
         return {
             "meeting_transcript": full_transcript,
