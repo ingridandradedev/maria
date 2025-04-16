@@ -9,3 +9,5 @@ google-cloud-speech
 vertexai
 google-cloud-storage
 requests
+pdfkit
+jinja2
