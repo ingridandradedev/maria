@@ -1,5 +1,15 @@
+# filepath: d:\PROJETOS  VS CODE\maria\app\Dockerfile
+
 # Use uma imagem base do Python
 FROM python:3.11-slim
+
+# Instala dependências do sistema e o wkhtmltopdf
+RUN apt-get update && apt-get install -y \
+    wkhtmltopdf \
+    libxrender1 \
+    libxext6 \
+    libfontconfig1 \
+    && apt-get clean
 
 # Define o diretório de trabalho
 WORKDIR /app
@@ -7,7 +17,7 @@ WORKDIR /app
 # Copia os arquivos de dependências
 COPY requirements.txt . 
 
-# Instala as dependências
+# Instala as dependências do Python
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia o restante do código da aplicação

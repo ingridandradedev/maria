@@ -261,7 +261,7 @@ def generate_pdf_and_upload(state: Dict[str, Any]):
     rendered_html = template.render(feedback)
 
     # Caminho absoluto do executável wkhtmltopdf
-    config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
+    config = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")
     options = {
         "enable-local-file-access": ""  # Permite acesso a arquivos locais
     }
