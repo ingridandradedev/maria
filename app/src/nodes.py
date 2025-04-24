@@ -63,25 +63,26 @@ def transcribe_audio(state: Dict[str, Any]):
     )
 
     try:
-        audio_file_url = state["audio_file"]
-        logging.debug(f"Baixando arquivo de áudio da URL: {audio_file_url}")
+        audio_source = state["audio_file"]
 
-        # Baixa o arquivo de áudio localmente
-        local_audio_path = "temp_audio.mp3"
-        with requests.get(audio_file_url, stream=True) as response:
-            response.raise_for_status()
-            with open(local_audio_path, "wb") as audio_file:
-                for chunk in response.iter_content(chunk_size=8192):
-                    audio_file.write(chunk)
+        # Se vier como gs://… passa direto para o Speech-to-Text
+        if audio_source.startswith("gs://"):
+            logging.debug(f"Usando URI GCS para áudio: {audio_source}")
+            audio = speech.RecognitionAudio(uri=audio_source)
 
-        logging.debug(f"Arquivo de áudio baixado com sucesso: {local_audio_path}")
-
-        # Lê o conteúdo do arquivo de áudio
-        with open(local_audio_path, "rb") as audio_file:
-            audio_content = audio_file.read()
-
-        # Configura o áudio para o Google Speech-to-Text
-        audio = speech.RecognitionAudio(content=audio_content)
+        else:
+            # mantém o download e inline antigo para URLs assinadas ou HTTP(s)
+            logging.debug(f"Baixando arquivo de áudio da URL: {audio_source}")
+            local_audio_path = "temp_audio.mp3"
+            with requests.get(audio_source, stream=True) as response:
+                response.raise_for_status()
+                with open(local_audio_path, "wb") as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        f.write(chunk)
+            with open(local_audio_path, "rb") as f:
+                audio_content = f.read()
+            os.remove(local_audio_path)
+            audio = speech.RecognitionAudio(content=audio_content)
 
         logging.debug("Iniciando transcrição de áudio com diarization...")
 
