@@ -62,6 +62,8 @@ def transcribe_audio(state: Dict[str, Any]):
         )
     )
 
+    local_audio_path = None  # Inicializa a variável
+
     try:
         audio_source = state["audio_file"]
 
@@ -132,9 +134,6 @@ def transcribe_audio(state: Dict[str, Any]):
 
         logging.debug(f"Transcrição com diarization concluída. Tamanho: {len(full_transcript)} caracteres")
 
-        # Remove o arquivo local após a transcrição
-        os.remove(local_audio_path)
-
         return {
             "meeting_transcript": full_transcript,
             "messages": [
@@ -150,6 +149,11 @@ def transcribe_audio(state: Dict[str, Any]):
                 {"role": "ai", "content": f"Erro na transcrição: {str(e)}"}
             ]
         }
+
+    finally:
+        # Remove o arquivo local se ele foi criado
+        if local_audio_path and os.path.exists(local_audio_path):
+            os.remove(local_audio_path)
 
 def load_gemini_model():
     from vertexai import init
