@@ -2,34 +2,39 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from src.agent import graph
 
-# Define o modelo de entrada para a API
+# Modelo de entrada continua o mesmo
 class AudioRequest(BaseModel):
     audio_url: str
 
-# Define o modelo de saída para a API
-class PDFResponse(BaseModel):
+# Novo modelo de saída, com PDF e transcrição
+class ProcessAudioResponse(BaseModel):
     pdf_url: str
+    meeting_transcription: str
 
-# Inicializa a aplicação FastAPI
 app = FastAPI()
 
-@app.post("/process-audio", response_model=PDFResponse)
+@app.post("/process-audio", response_model=ProcessAudioResponse)
 async def process_audio(request: AudioRequest):
     """
-    Endpoint para processar o áudio e retornar a URL do PDF gerado.
+    Endpoint para processar o áudio e retornar a URL do PDF gerado
+    e a transcrição completa da reunião.
     """
     try:
-        # Executa o grafo com a URL do áudio
         result = graph.invoke({
             "audio_file": request.audio_url
         })
 
-        # Obtém a URL do PDF gerado
         pdf_url = result.get("pdf_url")
         if not pdf_url:
             raise HTTPException(status_code=500, detail="Erro ao gerar o PDF.")
 
-        return PDFResponse(pdf_url=pdf_url)
+        # Extrai a transcrição produzida em transcribe_audio()
+        meeting_transcription = result.get("meeting_transcript", "")
+
+        return ProcessAudioResponse(
+            pdf_url=pdf_url,
+            meeting_transcription=meeting_transcription
+        )
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao processar o áudio: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro ao processar o áudio: {e}")
