@@ -97,7 +97,8 @@ def transcribe_audio(state: Dict[str, Any]):
         )
 
         logging.debug("Aguardando conclusão da transcrição...")
-        response = operation.result(timeout=300)
+        # Aumenta timeout para suportar gravações longas (até 40+ minutos)
+        response = operation.result(timeout=3600)
 
         full_transcript_with_speakers = []
 
