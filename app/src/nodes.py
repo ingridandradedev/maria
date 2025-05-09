@@ -5,12 +5,12 @@ import json
 from typing import Dict, Any
 from datetime import datetime, timedelta
 
-# Bibliotecas para PDF
+# PDF
 import pdfkit
 import jinja2
 
-# Google Cloud
-from google.cloud import storage
+# GCP
+from google.cloud import storage, secretmanager
 from google.oauth2 import service_account
 from langchain_google_vertexai import ChatVertexAI
 from google.cloud import speech_v1p1beta1 as speech
@@ -19,19 +19,25 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
 
-# Carrega variáveis de ambiente e credenciais
 load_dotenv()
-CREDENTIALS_PATH = os.path.join(os.path.dirname(__file__), "maria-457717-9fa8d402e552.json")
 
-if not os.path.exists(CREDENTIALS_PATH):
-    raise FileNotFoundError(f"Arquivo de credenciais não encontrado: {CREDENTIALS_PATH}")
+# recupera o nome do secret (com versão) do .env
+SECRET_NAME = os.getenv("GOOGLE_SECRET_NAME")
+if not SECRET_NAME:
+    raise RuntimeError("GOOGLE_SECRET_NAME não definido no .env")
 
-with open(CREDENTIALS_PATH, "r") as f:
-    CREDENTIALS_JSON = json.load(f)
+def get_credentials() -> service_account.Credentials:
+    client = secretmanager.SecretManagerServiceClient()
+    # acessa a versão latest do secret
+    response = client.access_secret_version(request={"name": SECRET_NAME})
+    payload = response.payload.data.decode("utf-8")
+    info = json.loads(payload)
+    return service_account.Credentials.from_service_account_info(info)
 
-credentials = service_account.Credentials.from_service_account_info(CREDENTIALS_JSON)
+# instancia única
+credentials = get_credentials()
 
-# Configurações do Google Cloud Storage
+# bucket GCS
 BUCKET_NAME = "projeto-maria-1-0-pecege"
 
 logging.basicConfig(level=logging.DEBUG)
@@ -41,7 +47,7 @@ def transcribe_audio(state: Dict[str, Any]):
     Transcreve um arquivo de áudio usando Google Speech-to-Text v1 com diarization.
     Suporta URLs assinadas ao baixar o arquivo localmente.
     """
-    client = speech.SpeechClient()
+    client = speech.SpeechClient(credentials=credentials)
 
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.MP3,
