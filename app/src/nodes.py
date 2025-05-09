@@ -21,7 +21,8 @@ from dotenv import load_dotenv
 
 # Carrega variáveis de ambiente e credenciais
 load_dotenv()
-CREDENTIALS_PATH = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
+CREDENTIALS_PATH = os.path.join(os.path.dirname(__file__), "maria-457717-9fa8d402e552.json")
+
 if not os.path.exists(CREDENTIALS_PATH):
     raise FileNotFoundError(f"Arquivo de credenciais não encontrado: {CREDENTIALS_PATH}")
 
