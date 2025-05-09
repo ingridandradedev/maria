@@ -6,13 +6,12 @@ services:
       context: ./app  # Atualizado para apontar para a pasta app
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "8080:8000"  # Mapeia a porta 8080 do host para a 8000 do container
     volumes:
       - ./app:/app  # Atualizado para refletir o novo caminho
     environment:
       - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
       - GOOGLE_APPLICATION_CREDENTIALS=/app/maria-456618-871b8f622168.json
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - LANGSMITH_TRACING=${LANGSMITH_TRACING}
       - LANGSMITH_ENDPOINT=${LANGSMITH_ENDPOINT}
       - LANGSMITH_API_KEY=${LANGSMITH_API_KEY}

@@ -24,10 +24,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .  
 
 # Copia o arquivo de credenciais para o contêiner
-COPY maria-456618-871b8f622168.json /app/maria-456618-871b8f622168.json
+COPY maria-457717-9fa8d402e552.json /app/maria-457717-9fa8d402e552.json
 
-# Expõe a porta que o FastAPI usará
-EXPOSE 8000
+# Expõe a nova porta que o FastAPI usará
+EXPOSE 8080
 
 # Comando para iniciar a aplicação
 CMD ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8000"]
