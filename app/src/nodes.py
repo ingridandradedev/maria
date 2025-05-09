@@ -21,7 +21,13 @@ from dotenv import load_dotenv
 
 # Carrega variáveis de ambiente e credenciais
 load_dotenv()
-CREDENTIALS_JSON = json.loads(os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON", "{}"))
+CREDENTIALS_PATH = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
+if not os.path.exists(CREDENTIALS_PATH):
+    raise FileNotFoundError(f"Arquivo de credenciais não encontrado: {CREDENTIALS_PATH}")
+
+with open(CREDENTIALS_PATH, "r") as f:
+    CREDENTIALS_JSON = json.load(f)
+
 credentials = service_account.Credentials.from_service_account_info(CREDENTIALS_JSON)
 
 # Configurações do Google Cloud Storage
