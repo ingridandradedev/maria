@@ -11,7 +11,7 @@ services:
       - ./app:/app  # Atualizado para refletir o novo caminho
     environment:
       - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
-      - GOOGLE_APPLICATION_CREDENTIALS=/app/maria-456618-871b8f622168.json
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/maria-457717-9fa8d402e552.json
       - LANGSMITH_TRACING=${LANGSMITH_TRACING}
       - LANGSMITH_ENDPOINT=${LANGSMITH_ENDPOINT}
       - LANGSMITH_API_KEY=${LANGSMITH_API_KEY}
