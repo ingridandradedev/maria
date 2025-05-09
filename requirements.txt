@@ -10,6 +10,7 @@ google-cloud-aiplatform
 google-cloud-speech
 vertexai
 google-cloud-storage
+google-cloud-secret-manager
 requests
 pdfkit
 jinja2
